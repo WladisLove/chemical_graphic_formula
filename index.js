@@ -212,8 +212,7 @@ const checkSubstanceKind = (formula) => {
         && METALS.some(me => _f.indexOf(me) !== -1)) return HYDROXIDE;
 
     for (let key in ACID_GROUPS) {
-        //console.log(_f, key, _f.indexOf(key) !== -1);
-        if (_f.indexOf(key) !== -1) {
+        if (_f.indexOf(key) !== -1 && _f.indexOf(key) === _f.length - key.length -1) {
             return _f[0] === 'h' ? ACID : (
                 METALS.some(me => _f.indexOf(me) === 0) 
                     ? SALT : isOxide(_f) 
