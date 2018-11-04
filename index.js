@@ -102,31 +102,50 @@ const drawElementColumn = (el, count) => {
                 <div class="_single-bonding bonding"><span>—</span></div>
                 <div class="element">H</div>
             </div>`
+        ) : el === 'ho' ? (
+            `<div class="ho-element"> 
+                <div class="element">O</div>
+                <div class="_single-bonding bonding"><span>—</span></div>
+                <div class="element">H</div>
+            </div>`
         ) : '<div class="element">'+el+'</div>';
     }
     column = '<div class="element-column column">' + column + '</div>';
     return column;
 }
 
-const drawBondColumn = (f_el_count, s_el_count) => {
+const drawBondColumn = (f_el_count, s_el_count, isSingleBonding = false) => {
     if (!f_el_count || !s_el_count) return '';
     switch (f_el_count){
         case 1: {
             return s_el_count === 1 ? (
-                '<div class="bonding-column column"><div class="_dual-bonding bonding"><div class="_1st">—</div><div class="_2nd">—</div></div></div>'
+                isSingleBonding ? 
+                '<div class="bonding-column column"><div class="_single-bonding bonding"><span>—</span></div></div>' 
+                : '<div class="bonding-column column"><div class="_dual-bonding bonding"><div class="_1st">—</div><div class="_2nd">—</div></div></div>'
             ) : (
                 s_el_count === 2 ? (
+                    isSingleBonding ? 
                     `<div class="bonding-column column">
-                    <div class="_dual-bonding bonding" style="transform: rotate(-15deg)"><div class="_1st">—</div><div class="_2nd">—</div></div>
-                    <div class="_dual-bonding bonding" style="transform: rotate(15deg)"><div class="_1st">—</div><div class="_2nd">—</div></div>
-                </div>`
+                        <div class="_single-bonding bonding" style="transform: rotate(-15deg)"><span>—</span></div>
+                        <div class="_single-bonding bonding" style="transform: rotate(15deg)"><span>—</span></div>
+                    </div>`
+                    : `<div class="bonding-column column">
+                        <div class="_dual-bonding bonding" style="transform: rotate(-15deg)"><div class="_1st">—</div><div class="_2nd">—</div></div>
+                        <div class="_dual-bonding bonding" style="transform: rotate(15deg)"><div class="_1st">—</div><div class="_2nd">—</div></div>
+                    </div>`
                 ) : (
                     s_el_count === 3 ? (
+                        isSingleBonding ?
                         `<div class="bonding-column column">
-                        <div class="_dual-bonding bonding" style="transform: rotate(-20deg)"><div class="_1st">—</div><div class="_2nd">—</div></div>
-                        <div class="_dual-bonding bonding"><div class="_1st">—</div><div class="_2nd">—</div></div>
-                        <div class="_dual-bonding bonding" style="transform: rotate(20deg)"><div class="_1st">—</div><div class="_2nd">—</div></div>
-                    </div>`
+                            <div class="_single-bonding bonding" style="transform: rotate(-20deg)"><span>—</span></div>
+                            <div class="_single-bonding bonding"><span>—</span></div>
+                            <div class="_single-bonding bonding" style="transform: rotate(20deg)"><span>—</span></div>
+                        </div>`
+                        : `<div class="bonding-column column">
+                            <div class="_dual-bonding bonding" style="transform: rotate(-20deg)"><div class="_1st">—</div><div class="_2nd">—</div></div>
+                            <div class="_dual-bonding bonding"><div class="_1st">—</div><div class="_2nd">—</div></div>
+                            <div class="_dual-bonding bonding" style="transform: rotate(20deg)"><div class="_1st">—</div><div class="_2nd">—</div></div>
+                        </div>`
                     ) : (
                         null
                     )
@@ -135,10 +154,15 @@ const drawBondColumn = (f_el_count, s_el_count) => {
         }
         case 2: {
             return s_el_count === 1 ? (
+                isSingleBonding ? 
                 `<div class="bonding-column column">
-				<div class="_single-bonding bonding" style="transform: rotate(15deg)"><span>—</span></div>
-				<div class="_single-bonding bonding" style="transform: rotate(-15deg)"><span>—</span></div>
-			</div>`
+                    <div class="_single-bonding bonding" style="transform: rotate(15deg)"><span>—</span></div>
+                    <div class="_single-bonding bonding" style="transform: rotate(-15deg)"><span>—</span></div>
+                </div>` 
+                : `<div class="bonding-column column">
+                    <div class="_single-bonding bonding" style="transform: rotate(15deg)"><span>—</span></div>
+                    <div class="_single-bonding bonding" style="transform: rotate(-15deg)"><span>—</span></div>
+                </div>`
             ) : (
                 s_el_count === 3 ? (
                     `<div class="bonding-column column">
@@ -188,6 +212,7 @@ const checkSubstanceKind = (formula) => {
         && METALS.some(me => _f.indexOf(me) !== -1)) return HYDROXIDE;
 
     for (let key in ACID_GROUPS) {
+        //console.log(_f, key, _f.indexOf(key) !== -1);
         if (_f.indexOf(key) !== -1) {
             return _f[0] === 'h' ? ACID : (
                 METALS.some(me => _f.indexOf(me) === 0) 
@@ -239,8 +264,8 @@ const drawOxide = (f) => {
         maxCount = maxCount > struct[el] ? maxCount : struct[el];
         let nextCount = struct[keysArr[index + 1]];
         return el === 'o' ? 
-            accum + drawBondColumn(nextCount, struct[el]) + drawElementColumn(el,struct[el]) 
-            : drawElementColumn(el, struct[el]) + drawBondColumn(struct[el], nextCount) + accum;
+            accum + drawBondColumn(nextCount, struct[el], true) + drawElementColumn(el,struct[el]) 
+            : drawElementColumn(el, struct[el]) + drawBondColumn(struct[el], nextCount, true) + accum;
     }, '');
 
     return decorateFormulaArea(view, maxCount);
@@ -260,10 +285,55 @@ const drawHydroxide = (f) => {
         maxCount = maxCount > struct[el] ? maxCount : struct[el];
         let nextCount = struct[keysArr[index + 1]];
         return el === HYDROXIDE_GROUP ? 
-            accum + drawBondColumn(nextCount, struct[el]) + drawElementColumn(el, struct[el]) 
-            : drawElementColumn(el, struct[el]) + drawBondColumn(struct[el], nextCount) + accum;
+            accum + drawBondColumn(nextCount, struct[el], true) + drawElementColumn(el, struct[el]) 
+            : drawElementColumn(el, struct[el]) + drawBondColumn(struct[el], nextCount, true) + accum;
     }, '');
 
+    return decorateFormulaArea(view, maxCount);
+}
+
+const drawAcid = (f) => {
+    let struct = {},
+    _f = f.toLowerCase(),
+    view = '',
+    maxCount = 0,
+    minCount = 0;
+
+    let elem = Object.keys(ACID_GROUPS).find(el => _f.indexOf(el) !== -1);
+    if(!elem) return null;
+    struct = findOxGroupStruct(_f, elem);
+    if(elem.indexOf('o') !== -1){
+        struct = {
+            ...struct, 
+            ...findOxGroupStruct(elem, 'o')
+        };
+        if(struct.o < struct.h) return null;
+        minCount = struct.h;
+        delete struct[elem];
+        delete struct.h;
+        struct.o = struct.o - minCount;
+        maxCount = minCount;
+
+        let keysArr = Object.keys(struct);
+        view = keysArr.reduce((accum, el, index) => {
+            maxCount = maxCount > struct[el] ? maxCount : struct[el];
+            let nextCount = struct[keysArr[index + 1]];
+            return el === 'o' ? 
+                accum + drawBondColumn(nextCount, struct[el]) + drawElementColumn(el, struct[el])
+                : drawElementColumn(el, struct[el]) + drawBondColumn(struct[el], nextCount) + accum;
+        }, '');
+
+        view = drawElementColumn('ho', minCount) + drawBondColumn(minCount, 1) + view;
+    } else {
+        let keysArr = Object.keys(struct);
+        view = keysArr.reduce((accum, el, index) => {
+            maxCount = maxCount > struct[el] ? maxCount : struct[el];
+            let nextCount = struct[keysArr[index + 1]];
+            return el === 'h' ? 
+                drawElementColumn(el, struct[el]) + drawBondColumn(struct[el], nextCount, true) + accum
+                : accum + drawBondColumn(nextCount, struct[el], true) + drawElementColumn(el, struct[el]);
+        }, '');
+    }
     return decorateFormulaArea(view, maxCount);
 }
 
@@ -285,6 +355,9 @@ window.addEventListener('load', () => {
                     break;
                 case HYDROXIDE:
                     flaView = drawHydroxide(formula);
+                    break;
+                case ACID:
+                    flaView = drawAcid(formula);
                     break;
                 default:
                     flaView = '';
