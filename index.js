@@ -148,7 +148,22 @@ const drawBondColumn = (f_el_count, s_el_count) => {
                     <div class="_dual-bonding bonding" style="transform: rotate(15deg)"><div class="_1st">—</div><div class="_2nd">—</div></div>
                 </div>`
                 ) : (
-                    null
+                    s_el_count === 4 ? (
+                        null
+                    ) : (
+                        s_el_count === 5 ? (
+                            `<div class="bonding-column column">
+                            <div class="_dual-bonding bonding" style="transform: rotate(-25deg)"><div class="_1st">—</div><div class="_2nd">—</div></div>
+                            <div class="_dual-bonding bonding" style="transform: rotate(5deg)"><div class="_1st">—</div><div class="_2nd">—</div></div>
+                            <div class="_single-bonding bonding" style="transform: rotate(25deg)"><span>—</span></div>
+                            <div class="_single-bonding bonding" style="transform: rotate(-25deg)"><span>—</span></div>
+                            <div class="_dual-bonding bonding" style="transform: rotate(-5deg)"><div class="_1st">—</div><div class="_2nd">—</div></div>
+                            <div class="_dual-bonding bonding" style="transform: rotate(25deg)"><div class="_1st">—</div><div class="_2nd">—</div></div>
+                        </div>`
+                        ) : (
+                            null
+                        )
+                    )
                 )
             );
         }
